@@ -15,7 +15,7 @@ public class Image extends JPanel {
 
     private BufferedImage bufferedImage;
 
-
+    // Singleton
     private static final Image image = new Image();
     public static Image getInstance(){
         return image;

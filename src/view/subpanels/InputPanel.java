@@ -3,8 +3,6 @@ package view.subpanels;
 import lombok.Getter;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 @Getter
 public class InputPanel extends JPanel {

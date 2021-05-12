@@ -4,13 +4,9 @@ import controller.ImageController;
 import view.subpanels.ImageHolderPanel;
 import view.subpanels.InputPanel;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
-
 
 public class MainFrame extends JFrame implements ActionListener {
 
@@ -57,21 +53,6 @@ public class MainFrame extends JFrame implements ActionListener {
                 inputPanel.getYLocationTextField().getText()
         );
 
-        System.out.println(
-                "RGB in the point: " + imageController.getCurrentBufferedImage().getRGB(
-                        xLocation,
-                        yLocation
-                )
-        );
-
-        System.out.println(
-                "NEXT TO IT: " + imageController.getCurrentBufferedImage().getRGB(
-                        xLocation + 1,
-                        yLocation
-                )
-        );
-
-
         imageController.bucketFill(
                 xLocation,
                 yLocation);
@@ -79,13 +60,5 @@ public class MainFrame extends JFrame implements ActionListener {
         imageHolderPanel.updateImage(
                 imageController.getCurrentBufferedImage()
         );
-
-        File file = new File("image2.bmp");
-
-
-        try{
-            ImageIO.write(imageController.getCurrentBufferedImage(), "bmp", file);
-        }catch (IOException b){}
-
     }
 }
