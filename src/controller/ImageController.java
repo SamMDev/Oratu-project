@@ -2,6 +2,7 @@ package controller;
 
 import model.Image;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class ImageController {
@@ -30,18 +31,19 @@ public class ImageController {
             int newColor
     ){
 
-        int modifiedPixelsInRow = 0;
+        int modifiedPixels = 0;
+
+        // if(bufferedImage.getRGB(xLocation, yLocation) != newColor) return 0;
 
 
-        //if(bufferedImage.getRGB(xLocation, yLocation) != wantedColor) return 0;
 
         int colorOfTestedPixel;
-
         // tests pixel above
         try{
             colorOfTestedPixel = bufferedImage.getRGB(xLocation, yLocation - 1);
             if(colorOfTestedPixel == wantedColor){
                 bufferedImage.setRGB(xLocation, yLocation - 1, newColor);
+                modifiedPixels++;
             }
         }catch (ArrayIndexOutOfBoundsException ignored){}
 
@@ -50,7 +52,7 @@ public class ImageController {
             colorOfTestedPixel = bufferedImage.getRGB(xLocation + 1, yLocation);
             if(colorOfTestedPixel == wantedColor){
                 bufferedImage.setRGB(xLocation + 1, yLocation, newColor);
-                modifiedPixelsInRow++;
+                modifiedPixels++;
             }
         }catch (ArrayIndexOutOfBoundsException ignored){}
 
@@ -59,6 +61,7 @@ public class ImageController {
             colorOfTestedPixel = bufferedImage.getRGB(xLocation, yLocation + 1);
             if(colorOfTestedPixel == wantedColor){
                 bufferedImage.setRGB(xLocation, yLocation + 1, newColor);
+                modifiedPixels++;
             }
         }catch (ArrayIndexOutOfBoundsException ignored){}
 
@@ -67,12 +70,11 @@ public class ImageController {
             colorOfTestedPixel = bufferedImage.getRGB(xLocation - 1, yLocation);
             if(colorOfTestedPixel == wantedColor){
                 bufferedImage.setRGB(xLocation - 1, yLocation, newColor);
-                modifiedPixelsInRow++;
+                modifiedPixels++;
             }
         }catch (ArrayIndexOutOfBoundsException ignored){}
 
-        System.out.println(modifiedPixelsInRow);
-        return modifiedPixelsInRow;
+        return modifiedPixels;
 
     }
 
@@ -86,88 +88,50 @@ public class ImageController {
             Integer xLocation,
             Integer yLocation)
     {
+        // color to be filling the image
+        int newRandomRgbBucketColor = new Color((int)(Math.random() * 0x1000000)).getRGB();
 
-        int newRandomRgbBucketColor = (int)(Math.random() * 0x1000000);
-
+        // image
         BufferedImage bufferedImageToEdit = getCurrentBufferedImage();
 
+        // color of a first pixel
         int selectedPixelColor = bufferedImageToEdit.getRGB(xLocation, yLocation);
 
         // first pixel filled
         bufferedImageToEdit.setRGB(xLocation, yLocation, newRandomRgbBucketColor);
 
 
-        // down from the point
-        for(int rowIndex = yLocation; rowIndex < bufferedImageToEdit.getHeight(); rowIndex++){
+        int numberOfNewPixelModifies;
+        do{
+            numberOfNewPixelModifies = 0;
 
-            // right from the point
-            for(int columnIndex = xLocation; columnIndex < bufferedImageToEdit.getWidth(); columnIndex++){
-                int modifiedInARow = 0;
-                modifiedInARow +=
-                        testPixelsAround(
-                        columnIndex,
-                        rowIndex,
-                        bufferedImageToEdit,
-                        selectedPixelColor,
-                        newRandomRgbBucketColor
-                );
+            for(int rowIndex = 0; rowIndex < bufferedImageToEdit.getHeight(); rowIndex++){
 
-                if(modifiedInARow == 0) break;
+                for(int columnIndex = 0; columnIndex < bufferedImageToEdit.getWidth(); columnIndex++){
+
+
+                    int currentPixelColor = bufferedImageToEdit.getRGB(rowIndex, columnIndex);
+
+                    if(rowIndex == xLocation || columnIndex == yLocation){
+                        System.out.println(currentPixelColor == newRandomRgbBucketColor);
+                    }
+
+                    if(currentPixelColor == newRandomRgbBucketColor){
+                        numberOfNewPixelModifies +=
+                            testPixelsAround(
+                                    rowIndex,
+                                    columnIndex,
+                                    bufferedImageToEdit,
+                                    selectedPixelColor,
+                                    newRandomRgbBucketColor
+                            );
+                    }
+
+                }
 
             }
 
-            // left from the point
-            for(int columnIndex = xLocation - 1; columnIndex >= 0; columnIndex--){
-                int modifiedInARow = 0;
-                modifiedInARow +=
-                testPixelsAround(
-                        columnIndex,
-                        rowIndex,
-                        bufferedImageToEdit,
-                        selectedPixelColor,
-                        newRandomRgbBucketColor
-                );
-
-                if(modifiedInARow == 0) break;
-            }
-
-        }
-
-        // up from the point
-        for(int rowIndex = yLocation - 1; rowIndex >= 0; rowIndex--){
-            // right from the point
-            for(int columnIndex = xLocation; columnIndex < bufferedImageToEdit.getWidth(); columnIndex++){
-                int modifiedInARow = 0;
-
-                modifiedInARow +=
-                testPixelsAround(
-                        columnIndex,
-                        rowIndex,
-                        bufferedImageToEdit,
-                        selectedPixelColor,
-                        newRandomRgbBucketColor
-                );
-
-                if(modifiedInARow == 0) break;
-            }
-
-            // left from the point
-            for(int columnIndex = xLocation - 1; columnIndex >= 0; columnIndex--){
-                int modifiedInARow = 0;
-
-                modifiedInARow +=
-                testPixelsAround(
-                        columnIndex,
-                        rowIndex,
-                        bufferedImageToEdit,
-                        selectedPixelColor,
-                        newRandomRgbBucketColor
-                );
-
-                if(modifiedInARow == 0) break;
-            }
-
-        }
+        }while(numberOfNewPixelModifies > 0);
 
         image.setBufferedImage(bufferedImageToEdit);
 
